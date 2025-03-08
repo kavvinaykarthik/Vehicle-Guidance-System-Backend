@@ -8,7 +8,7 @@ from flask_cors import CORS
 from ultralytics import YOLO
 from PIL import Image
 from gtts import gTTS  # Google Text-to-Speech
-import os
+from playsound import playsound  # Import playsound
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -32,7 +32,7 @@ def voice_alert(message):
     # Use Google Text-to-Speech (gTTS) and save as MP3
     tts = gTTS(text=message, lang="en")
     tts.save("alert.mp3")
-    os.system("mpg321 alert.mp3")  # Play the MP3 (install mpg321 if needed)
+    playsound("alert.mp3")  # Play the MP3
 
 # Function to detect objects and process frame
 def process_frame(frame):
