@@ -5,4 +5,4 @@ numpy
 Pillow
 ultralytics
 gtts
-mpg321
+playsound
