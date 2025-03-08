@@ -1,0 +1,8 @@
+flask
+flask-cors
+opencv-python
+numpy
+pyttsx3
+ultralytics
+gunicorn
+pillow
