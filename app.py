@@ -1,40 +1,35 @@
 import cv2
 import numpy as np
-import base64
-import io
 import tempfile
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from ultralytics import YOLO
-from PIL import Image
-from gtts import gTTS  # Google Text-to-Speech
-from playsound import playsound  # Import playsound
 
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
-# Load YOLOv8 model
+# Load YOLOv8 model (make sure you have the correct model weights)
 model = YOLO("weights/yolov8n.pt")
 
-# Configuration
-KNOWN_WIDTH = 2.0  # Approximate width of car in meters
+# Configuration for distance estimation
+KNOWN_WIDTHS = {
+    "car": 2.0,  # Approximate width in meters
+    "person": 0.5,
+    "truck": 2.5,
+    "bus": 2.8,
+    "traffic light": 0.3,
+    "stop sign": 0.5
+}
 FOCAL_LENGTH = 1000  # Camera focal length for distance estimation
 
-# Function to estimate distance
-def estimate_distance(bbox_width):
-    return (KNOWN_WIDTH * FOCAL_LENGTH) / bbox_width if bbox_width else 0
+# Function to estimate distance based on bounding box width
+def estimate_distance(class_name, bbox_width):
+    if class_name in KNOWN_WIDTHS and bbox_width > 0:
+        return round((KNOWN_WIDTHS[class_name] * FOCAL_LENGTH) / bbox_width, 2)
+    return None  # Return None if the object is not in the list
 
-# Function to generate voice alerts
-def voice_alert(message):
-    print(message)  # Print alert in console
-
-    # Use Google Text-to-Speech (gTTS) and save as MP3
-    tts = gTTS(text=message, lang="en")
-    tts.save("alert.mp3")
-    playsound("alert.mp3")  # Play the MP3
-
-# Function to detect objects and process frame
+# Function to process the video frame and detect objects
 def process_frame(frame):
     results = model(frame)
     detected_objects = []
@@ -44,20 +39,18 @@ def process_frame(frame):
             x1, y1, x2, y2 = map(int, box.xyxy[0])
             conf = float(box.conf[0])
             cls = int(box.cls[0])
-            class_name = model.names[cls]
+            class_name = model.names[cls]  # Object name
 
-            if conf >= 0.5:
+            if conf >= 0.5:  # Only consider objects with high confidence
                 bbox_width = x2 - x1
-                distance = estimate_distance(bbox_width)
-                distance = round(distance, 2)
+                distance = estimate_distance(class_name, bbox_width)
 
-                detected_objects.append({"object": class_name, "distance": distance})
-
-                if distance <= 5:
-                    voice_alert(f"Warning! {class_name} detected within {distance} meters.")
+                if distance is not None:
+                    detected_objects.append({"object": class_name, "distance": distance})
 
     return detected_objects
 
+# API endpoint to process video and detect objects
 @app.route("/detect-video", methods=["POST"])
 def detect_video():
     try:
@@ -83,9 +76,11 @@ def detect_video():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
+# Home route
 @app.route("/")
 def home():
     return "Flask API is running!"
 
+# Run Flask app
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
