@@ -1,8 +1,8 @@
-flask
+Flask
 flask-cors
 opencv-python
 numpy
-pyttsx3
+Pillow
 ultralytics
-gunicorn
-pillow
+gtts
+mpg321
