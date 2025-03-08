@@ -1,22 +1,18 @@
 import cv2
 import numpy as np
-import pyttsx3
 import base64
 import io
+import tempfile
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from ultralytics import YOLO
 from PIL import Image
-import tempfile
+from gtts import gTTS  # Google Text-to-Speech
+import os
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)  # Enable CORS for React Native
-
-# Initialize text-to-speech engine
-engine = pyttsx3.init()
-engine.setProperty("rate", 150)
-engine.setProperty("volume", 1.0)
+CORS(app)
 
 # Load YOLOv8 model
 model = YOLO("weights/yolov8n.pt")
@@ -25,14 +21,20 @@ model = YOLO("weights/yolov8n.pt")
 KNOWN_WIDTH = 2.0  # Approximate width of car in meters
 FOCAL_LENGTH = 1000  # Camera focal length for distance estimation
 
+# Function to estimate distance
 def estimate_distance(bbox_width):
     return (KNOWN_WIDTH * FOCAL_LENGTH) / bbox_width if bbox_width else 0
 
+# Function to generate voice alerts
 def voice_alert(message):
     print(message)  # Print alert in console
-    engine.say(message)
-    engine.runAndWait()
 
+    # Use Google Text-to-Speech (gTTS) and save as MP3
+    tts = gTTS(text=message, lang="en")
+    tts.save("alert.mp3")
+    os.system("mpg321 alert.mp3")  # Play the MP3 (install mpg321 if needed)
+
+# Function to detect objects and process frame
 def process_frame(frame):
     results = model(frame)
     detected_objects = []
