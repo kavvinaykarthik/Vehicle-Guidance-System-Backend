@@ -1,8 +1,8 @@
 Flask
 flask-cors
-opencv-python
+opencv-python-headless  # Use headless version to avoid GUI errors
 numpy
 Pillow
 ultralytics
-gtts
-playsound
+gunicorn  # Required for Render deployment
+
