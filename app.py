@@ -2,12 +2,21 @@ from fastapi import FastAPI, UploadFile, File
 import cv2
 import numpy as np
 from ultralytics import YOLO
-import io
+import torch
+import os
 
 app = FastAPI()
 
+# Model download path
+MODEL_PATH = "yolov8n.pt"
+
+# Download YOLO model if not exists
+if not os.path.exists(MODEL_PATH):
+    print("Downloading YOLOv8n model...")
+    torch.hub.download_url_to_file("https://github.com/ultralytics/assets/releases/download/v8/yolov8n.pt", MODEL_PATH)
+
 # Load YOLO model
-model = YOLO("weights/yolov8n.pt")
+model = YOLO(MODEL_PATH)
 
 # Constants for distance estimation
 KNOWN_WIDTH = 2.0  # Approximate object width in meters
