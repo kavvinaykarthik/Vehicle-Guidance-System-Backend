@@ -3,5 +3,3 @@ uvicorn
 opencv-python
 numpy
 ultralytics
-gtts
-playsound
