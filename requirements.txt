@@ -1,7 +1,8 @@
 fastapi
 uvicorn
+torch
+ultralytics
 opencv-python
 numpy
-ultralytics
-torch
 requests
+python-multipart  # Required for FastAPI file uploads
