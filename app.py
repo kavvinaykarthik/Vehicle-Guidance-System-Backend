@@ -1,22 +1,21 @@
 # Backend (FastAPI) for Vehicle Guidance System
-type: code/python
-
 from fastapi import FastAPI, UploadFile, File
 import cv2
 import numpy as np
-import pyttsx3
 from ultralytics import YOLO
 import uvicorn
+from gtts import gTTS
+import os
 
 app = FastAPI()
 
 # Initialize YOLO model
-model = YOLO("weights/yolov8n.pt")
+model = YOLO("yolov8n.pt")  # Use downloaded model
 
-# Initialize text-to-speech engine
-engine = pyttsx3.init()
-engine.setProperty('rate', 150)
-engine.setProperty('volume', 1.0)
+def voice_alert(text):
+    tts = gTTS(text=text, lang="en")
+    tts.save("alert.mp3")
+    os.system("mpg321 alert.mp3")  # Use appropriate player for your OS
 
 @app.post("/detect/")
 async def detect_objects(file: UploadFile = File(...)):
@@ -35,8 +34,7 @@ async def detect_objects(file: UploadFile = File(...)):
             
             if conf > 0.5 and class_name.lower() in ["car", "bus", "traffic light"]:
                 alert = f"Warning! {class_name} detected."
-                engine.say(alert)
-                engine.runAndWait()
+                voice_alert(alert)
                 break
     
     return {"alert": alert}
