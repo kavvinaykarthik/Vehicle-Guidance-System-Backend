@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from io import BytesIO
 import requests
-
+import os
 app = FastAPI()
 
 # Ensure YOLO model is downloaded before starting
