@@ -4,5 +4,4 @@ opencv-python
 numpy
 ultralytics
 gtts
-mpg321
 playsound
