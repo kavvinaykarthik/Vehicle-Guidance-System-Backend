@@ -6,15 +6,18 @@ import numpy as np
 from io import BytesIO
 import requests
 import os
+
 app = FastAPI()
 
-# Ensure YOLO model is downloaded before starting
-MODEL_PATH = "yolov8n.pt"
+# Directories and Model Path
+MODEL_DIR = "models"
+MODEL_PATH = os.path.join(MODEL_DIR, "yolov8n.pt")
 YOLO_MODEL_URL = "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt"
 
-# Download the YOLO model if it does not exist
+# Function to download YOLO model if it does not exist
 def download_yolo_model():
     if not os.path.exists(MODEL_PATH):
+        os.makedirs(MODEL_DIR, exist_ok=True)  # Ensure the directory exists
         print("Downloading YOLO model...")
         response = requests.get(YOLO_MODEL_URL, stream=True)
         with open(MODEL_PATH, "wb") as f:
@@ -39,10 +42,22 @@ async def detect_objects(file: UploadFile = File(...)):
     # Parse detections
     detections = []
     for result in results:
-        for box in result.boxes:
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
-            class_name = result.names[int(box.cls[0])]
-            distance = round(10 / box.conf[0].item(), 2)  # Mock distance calculation
-            detections.append({"bbox": [x1, y1, x2, y2], "class": class_name, "distance_m": distance})
+        if result.boxes:  # Ensure boxes exist
+            for box in result.boxes:
+                x1, y1, x2, y2 = map(int, box.xyxy[0])
+                class_name = result.names[int(box.cls[0])]
+                confidence = box.conf[0].item()
+                distance = round(10 / confidence, 2) if confidence > 0 else "Unknown"  # Mock distance calc
 
-    return {"detections": detections}
+                detections.append({
+                    "bbox": [x1, y1, x2, y2],
+                    "class": class_name,
+                    "confidence": round(confidence, 2),
+                    "distance_m": distance
+                })
+
+    return {"detections": detections if detections else "No objects detected"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
