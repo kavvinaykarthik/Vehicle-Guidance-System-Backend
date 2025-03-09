@@ -2,5 +2,6 @@ fastapi
 uvicorn
 opencv-python
 numpy
-pyttsx3
 ultralytics
+gtts
+mpg321
