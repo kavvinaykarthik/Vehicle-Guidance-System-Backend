@@ -5,7 +5,7 @@ import pyttsx3
 from ultralytics import YOLO
 import uvicorn
 from io import BytesIO
-
+import os
 # Initialize FastAPI app
 app = FastAPI()
 
@@ -41,4 +41,5 @@ async def detect_objects(file: UploadFile = File(...)):
     return {"alerts": alerts}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
