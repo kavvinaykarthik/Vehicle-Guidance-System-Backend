@@ -4,18 +4,11 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 import uvicorn
-import os
-from playsound import playsound
 
 app = FastAPI()
 
 # Initialize YOLO model
 model = YOLO("yolov8n.pt")  # Use downloaded model
-
-def voice_alert(text):
-    tts = gTTS(text=text, lang="en")
-    tts.save("alert.mp3")
-    playsound("alert.mp3")  # Use appropriate player for your OS
 
 @app.post("/detect/")
 async def detect_objects(file: UploadFile = File(...)):
@@ -34,7 +27,6 @@ async def detect_objects(file: UploadFile = File(...)):
             
             if conf > 0.5 and class_name.lower() in ["car", "bus", "traffic light"]:
                 alert = f"Warning! {class_name} detected."
-                voice_alert(alert)
                 break
     
     return {"alert": alert}
