@@ -1,8 +1,6 @@
-Flask
-flask-cors
-opencv-python-headless  # Use headless version to avoid GUI errors
+fastapi
+uvicorn
+opencv-python
 numpy
-Pillow
+pyttsx3
 ultralytics
-gunicorn  # Required for Render deployment
-
