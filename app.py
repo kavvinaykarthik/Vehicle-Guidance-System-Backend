@@ -4,8 +4,8 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 import uvicorn
-from gtts import gTTS
 import os
+from playsound import playsound
 
 app = FastAPI()
 
@@ -15,7 +15,7 @@ model = YOLO("yolov8n.pt")  # Use downloaded model
 def voice_alert(text):
     tts = gTTS(text=text, lang="en")
     tts.save("alert.mp3")
-    os.system("mpg321 alert.mp3")  # Use appropriate player for your OS
+    playsound("alert.mp3")  # Use appropriate player for your OS
 
 @app.post("/detect/")
 async def detect_objects(file: UploadFile = File(...)):
