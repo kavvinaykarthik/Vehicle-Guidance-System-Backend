@@ -2,7 +2,7 @@ fastapi
 uvicorn
 torch
 ultralytics
-opencv-python
+opencv-python-headless  # Use headless version for server (no GUI needed)
 numpy
 requests
 python-multipart  # Required for FastAPI file uploads
