@@ -3,4 +3,5 @@ uvicorn
 opencv-python
 numpy
 ultralytics
-python-multipart
+torch
+requests
