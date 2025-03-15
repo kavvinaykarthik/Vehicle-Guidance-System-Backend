@@ -1,3 +1,4 @@
+uvicorn
 streamlit
 opencv-python
 numpy
