@@ -5,7 +5,7 @@ import mediapipe as mp
 import time
 import requests
 import threading
-import simpleaudio as sa  # For buzzer sound
+from playsound import playsound
 
 # Backend URL (Update with actual AWS endpoint)
 API_URL = "http://65.2.10.134:8000"  # Replace with your backend URL
@@ -33,7 +33,7 @@ ALERT_INTERVAL = 5  # Minimum time (seconds) between alerts
 buzzer_wave = sa.WaveObject.from_wave_file("buzzer.wav")  # Ensure you have a buzzer.wav file
 
 def play_buzzer():
-    buzzer_wave.play()
+    playsound("buzzer.wav")
 
 def get_landmark_coords(face_landmarks, indices, w, h):
     return [(int(face_landmarks.landmark[i].x * w), int(face_landmarks.landmark[i].y * h)) for i in indices]
