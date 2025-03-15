@@ -3,7 +3,4 @@ opencv-python
 numpy
 mediapipe
 requests
-playsound  # Alternative for audio alerts
-
-# Specify Python version
-python==3.9
+simpleaudio
